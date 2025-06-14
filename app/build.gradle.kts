@@ -25,6 +25,9 @@ dependencies {
     implementation(kotlin("stdlib"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.jetbrains.kotlin:kotlin-stdlib")
+
+    
+    implementation("org.springframework.boot:spring-boot-starter-security") // incluye BCrypt
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

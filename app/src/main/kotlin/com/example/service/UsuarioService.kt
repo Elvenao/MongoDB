@@ -19,8 +19,7 @@ class UsuarioService(
                 userName = CryptoUtils.decryptAES(usuario.userName, key),
                 name = CryptoUtils.decryptAES(usuario.name, key),
                 birthDate = CryptoUtils.decryptAES(usuario.birthDate, key),
-                email = CryptoUtils.decryptAES(usuario.email, key),
-                avatar = usuario.avatar
+                
             )
         }
     }
