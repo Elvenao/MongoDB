@@ -1,6 +1,8 @@
 package com.example.utils
 
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.ExpiredJwtException
+import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import com.example.model.UserLoginDto
@@ -23,7 +25,7 @@ object JwtUtil {
         return Jwts.builder()
             .setSubject(email)
             .setIssuedAt(Date())
-            .setExpiration(Date(System.currentTimeMillis() + 15 * 60 * 1000)) // 10 minutos
+            .setExpiration(Date(System.currentTimeMillis() +  10 * 60 * 1000 )) // 10 minutos
             .signWith(secretKey)
             .compact()
     }
@@ -44,24 +46,37 @@ object JwtUtil {
                 .build()
                 .parseClaimsJws(token)
                 .body
-
+            println("AccessToken valido")
             val expiration = claims.expiration
             expiration.after(Date())
-        } catch (e: Exception) {
-            false // token inválido o expirado
+            
+        } catch (e: ExpiredJwtException) {
+        // Token expirado
+            println("Token expirado")
+            false
+        } catch (e: JwtException) {
+            // Token inválido en estructura o firma
+            println("Token inválido: ${e.message}")
+            false
         }
     }
 
     fun validateRefreshToken(token: String): String? {
         try {
-            val claims = Jwts.parser()
+            val claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey) // misma clave usada para firmar refreshToken
+                .build()
                 .parseClaimsJws(token)
                 .body
-
+             println("Enviando refreshToken")
             return claims.subject // Suponiendo que guardaste el email como subject
-        } catch (e: Exception) {
-            return null // Token inválido o expirado
+           
+        } catch (e: ExpiredJwtException) {
+            println("Refresh token expirado")
+            return null
+        } catch (e: JwtException) {
+            println("Refresh token inválido")
+            return null
         }
     }
 
