@@ -28,15 +28,15 @@ class LoginController(
 
         return if (passwordValida) {
             // Aquí puedes generar y devolver un token, o lo que uses para sesiones
-            val accessToken = JwtUtil.generateAccessToken(emailDescifrado)
-            val refreshToken = JwtUtil.generateRefreshToken(emailDescifrado)
+            val accessToken = JwtUtil.generateAccessToken(usuario)
+            val refreshToken = JwtUtil.generateRefreshToken(usuario)
             ResponseEntity.ok(LoginResponse(
                 true,
                 "Inicio de sesión exitoso",
                 accessToken,
                 refreshToken,
-                usuario.id,
-                usuario.userName
+                //usuario.id,
+                //usuario.userName
                 ))
         } else {
             ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(LoginResponse(false,"Contraseña incorrecta"))
@@ -53,8 +53,8 @@ class LoginController(
         val user = usuarioRepository.findByEmail(userEmail)
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado")
 
-        val newAccessToken = JwtUtil.generateAccessToken(user.email)
-        val newRefreshToken = JwtUtil.generateRefreshToken(user.email) // opcional
+        val newAccessToken = JwtUtil.generateAccessToken(user)
+        val newRefreshToken = JwtUtil.generateRefreshToken(user) // opcional
 
         return ResponseEntity.ok(
             TokenResponse(

@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import com.example.model.UserLoginDto
 import java.util.*
+import com.example.model.Usuario
 
 object JwtUtil {
     private val secretKey = Keys.hmacShaKeyFor("8da949392%1!5423_381j39ja2$6asdfas12".toByteArray())
@@ -21,20 +22,32 @@ object JwtUtil {
             .compact()
     }
             */
-    fun generateAccessToken(email: String): String {
+    fun generateAccessToken(user: Usuario ): String {
         return Jwts.builder()
-            .setSubject(email)
+            .setSubject(user.email)
             .setIssuedAt(Date())
             .setExpiration(Date(System.currentTimeMillis() +  10 * 60 * 1000 )) // 10 minutos
+            .claim("email", user.email)
+            .claim("id",user.id)
+            .claim("userName",user.userName)
+            .claim("name", user.name)
+            .claim("birthDate", user.birthDate)
+            .claim("avatar", user.avatar)
             .signWith(secretKey)
             .compact()
     }
 
-    fun generateRefreshToken(email: String): String {
+    fun generateRefreshToken(user:Usuario): String {
         return Jwts.builder()
-            .setSubject(email)
+            .setSubject(user.email)
             .setIssuedAt(Date())
             .setExpiration(Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000)) // 7 días
+            .claim("email", user.email)
+            .claim("id",user.id)
+            .claim("userName",user.userName)
+            .claim("name", user.name)
+            .claim("birthDate", user.birthDate)
+            .claim("avatar", user.avatar)
             .signWith(secretKey)
             .compact()
     }
