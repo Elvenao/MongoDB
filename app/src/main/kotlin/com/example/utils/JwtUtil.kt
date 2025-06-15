@@ -8,8 +8,14 @@ import io.jsonwebtoken.security.Keys
 import com.example.model.UserLoginDto
 import java.util.*
 import com.example.model.Usuario
+import java.net.InetAddress
+
 
 object JwtUtil {
+    
+    private val ip = InetAddress.getLocalHost().hostAddress
+    
+
     private val secretKey = Keys.hmacShaKeyFor("8da949392%1!5423_381j39ja2$6asdfas12".toByteArray())
 
     /* 
@@ -23,6 +29,7 @@ object JwtUtil {
     }
             */
     fun generateAccessToken(user: Usuario ): String {
+        //println("IP local del servidor: $ip")
         return Jwts.builder()
             .setSubject(user.email)
             .setIssuedAt(Date())
@@ -35,6 +42,7 @@ object JwtUtil {
             .claim("biography",user.biography)
             .claim("genres",user.biography)
             .claim("avatar", user.avatar)
+            .claim("ip",ip)
             .signWith(secretKey)
             .compact()
     }
