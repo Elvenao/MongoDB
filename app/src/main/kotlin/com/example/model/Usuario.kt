@@ -9,6 +9,8 @@ data class Usuario(
     val userName: String,
     val name: String,
     val birthDate: String,
+    val biography: String,
+    val genres: List<*>,
     val email: String,
     val password: String,
     val avatar: String  
