@@ -11,6 +11,7 @@ data class Usuario(
     val birthDate: String,
     val biography: String,
     val genres: List<*>,
+    val joiningDate: String,
     val email: String,
     val password: String,
     val avatar: String  
