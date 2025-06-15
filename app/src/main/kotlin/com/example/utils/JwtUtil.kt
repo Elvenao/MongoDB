@@ -29,7 +29,7 @@ object JwtUtil {
     }
             */
     fun generateAccessToken(user: Usuario ): String {
-        //println("IP local del servidor: $ip")
+        println("IP local del servidor: $ip")
         return Jwts.builder()
             .setSubject(user.email)
             .setIssuedAt(Date())
@@ -60,6 +60,7 @@ object JwtUtil {
             .claim("biography",user.biography)
             .claim("genres",user.biography)
             .claim("avatar", user.avatar)
+            .claim("ip",ip)
             .signWith(secretKey)
             .compact()
     }
