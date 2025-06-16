@@ -7,6 +7,7 @@ import com.example.service.UsuarioService
 import com.example.utils.JwtUtil
 import com.example.utils.HashingUtils
 import com.example.utils.CryptoUtils
+import com.example.model.UserNameDto
 
 
 import org.springframework.http.ResponseEntity
@@ -31,9 +32,31 @@ class UsersController(
         return ResponseEntity.ok(usuarios)
     }
 
+    @PostMapping("/signup/userName")
+    fun repeteadUserName(@RequestBody userName: UserNameDto): ResponseEntity<Any>{
+        val repeteadUserName = usuarioRepository.findByUserName(userName.userName)
+        println(userName)
+        println(repeteadUserName)
+        if(repeteadUserName != null){
+            println("Repetido")
+            return ResponseEntity.ok(
+                LoginResponse(
+                    false,
+                    "Nombre de usuario ya registrado"
+                )
+            )
+        }
+        println("No Repetido")
+        return ResponseEntity.ok(LoginResponse(
+            true,
+            "Nombre de usuario no registrado"
+        ))
+    }
+    
     @PostMapping("/signup")
     fun signUp(@RequestBody usuario: Usuario): ResponseEntity<Any>{
         val repeteadEmail = usuarioRepository.findByEmail(usuario.email)
+        println(usuario.email)
         if(repeteadEmail != null){
             println("Email repetido")
             return ResponseEntity.ok(
@@ -47,7 +70,6 @@ class UsersController(
         if(usuario.password.trim().length < 8)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("La contraseña debe de tener una longitud mayor a 8 caracteres")
         usuario.password = HashingUtils.hashingBCrypt(usuario.password)
-        usuario.userName = CryptoUtils.encryptAES(usuario.userName)
         usuario.name = CryptoUtils.encryptAES(usuario.name)
         usuario.birthDate = CryptoUtils.encryptAES(usuario.birthDate)
         usuarioRepository.save(usuario)
