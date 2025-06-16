@@ -6,14 +6,14 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document(collection = "Users")
 data class Usuario(
     @Id val id: String? = null,
-    val userName: String,
-    val name: String,
-    val birthDate: String,
-    val biography: String,
-    val genres: List<*>,
-    val joiningDate: String,
-    val email: String,
-    val password: String,
-    val avatar: String  
+    var userName: String,
+    var name: String,
+    var biography: String? = null,
+    var genres: List<Any>? = null,
+    var birthDate: String,
+    var joiningDate: String,
+    var password: String,
+    var email: String,
+    var avatar: String? = null  
 
 )
