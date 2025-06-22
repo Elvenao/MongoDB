@@ -21,7 +21,27 @@ class LoginController(
     @PostMapping("/login")
     fun login(@RequestBody userLoginDto: UserLoginDto): ResponseEntity<Any> {
         val emailDescifrado = userLoginDto.email // si lo tienes cifrado
-        val usuario = usuarioRepository.findByEmail(emailDescifrado)
+        var usuario = usuarioRepository.findByUserName(emailDescifrado)
+        
+        if(usuario != null){
+            val passwordValida = BCrypt.checkpw(userLoginDto.password, usuario.password) 
+            return if (passwordValida) {
+            // Aquí puedes generar y devolver un token, o lo que uses para sesiones
+            val accessToken = JwtUtil.generateAccessToken(usuario)
+            val refreshToken = JwtUtil.generateRefreshToken(usuario)
+            ResponseEntity.ok(LoginResponse(
+                true,
+                "Inicio de sesión exitoso",
+                accessToken,
+                refreshToken,
+                //usuario.id,
+                //usuario.userName
+                ))
+            } else {
+                ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(LoginResponse(false,"Contraseña incorrecta"))
+            }
+        }
+        usuario = usuarioRepository.findByEmail(emailDescifrado)
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado")
 
         val passwordValida = BCrypt.checkpw(userLoginDto.password, usuario.password)
