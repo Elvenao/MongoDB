@@ -9,7 +9,7 @@ data class Usuario(
     var userName: String,
     var name: String,
     var biography: String? = null,
-    var genres: List<Any>? = null,
+    var genres: List<String>? = null,
     var birthDate: String,
     var joiningDate: String,
     var password: String,

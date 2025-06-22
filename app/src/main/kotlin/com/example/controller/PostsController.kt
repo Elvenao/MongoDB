@@ -16,6 +16,7 @@ class PostController(
 
     @PostMapping("/create")
     fun crear(@RequestBody post: Post): ResponseEntity<Any> {
+        println("HOLA")
         postRepository.save(post)
         return ResponseEntity.ok(PostResponse(
             true,

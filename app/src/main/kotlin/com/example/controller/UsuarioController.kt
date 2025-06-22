@@ -8,6 +8,7 @@ import com.example.utils.JwtUtil
 import com.example.utils.HashingUtils
 import com.example.utils.CryptoUtils
 import com.example.model.UserNameDto
+import com.example.model.UpdateCategoriesRequest
 
 
 import org.springframework.http.ResponseEntity
@@ -30,6 +31,24 @@ class UsersController(
     fun listAll(): ResponseEntity<List<Usuario>> {
         val usuarios: List<Usuario> = usuarioService.getAllUsersDecrypted()
         return ResponseEntity.ok(usuarios)
+    }
+
+    @PatchMapping("users/categories/{id}")
+    fun updateCategories(
+        @PathVariable id: String,
+        @RequestBody update: UpdateCategoriesRequest
+    ): ResponseEntity<LoginResponse> {
+        val p = update.categories
+        val existing = usuarioRepository.findById(id).orElse(null)
+
+        return if (existing != null) {
+            val updated = existing.copy(genres = p)
+            usuarioRepository.save(updated)
+            ResponseEntity.ok(LoginResponse(true, "Categorías actualizadas"))
+        } else {
+            ResponseEntity.ok(LoginResponse(false, "Categorías no actualizadas"))
+        }
+        
     }
 
     @PostMapping("/signup/userName")
