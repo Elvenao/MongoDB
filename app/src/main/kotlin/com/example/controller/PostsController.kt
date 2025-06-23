@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.http.ResponseEntity
 import com.example.model.Comentario
 
+
+
 data class PostWithAvatar(
     val post: Post,
     val userAvatar: String?
@@ -78,5 +80,14 @@ class PostController(
             )
         }
         return ResponseEntity.notFound().build()
+    }
+    @PostMapping("/create")
+    fun crear(@RequestBody post: Post): ResponseEntity<Any> {
+        println("HOLA")
+        postRepository.save(post)
+        return ResponseEntity.ok(PostResponse(
+            true,
+            "Post creado exitosamente"
+        ))
     }
 }
