@@ -114,7 +114,8 @@ class UsersController(
         usuario.password = HashingUtils.hashingBCrypt(usuario.password)
         usuario.name = CryptoUtils.encryptAES(usuario.name)
         usuario.birthDate = CryptoUtils.encryptAES(usuario.birthDate)
-        usuarioRepository.save(usuario)
+        val saverdUser = usuarioRepository.save(usuario)
+        println("Usuario guardado: ${usuario.id} con email: ${usuario.email}")
         val accessToken = JwtUtil.generateAccessToken(usuario)
         val refreshToken = JwtUtil.generateRefreshToken(usuario)
         return ResponseEntity.ok(LoginResponse(

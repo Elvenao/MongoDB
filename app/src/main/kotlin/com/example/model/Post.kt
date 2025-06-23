@@ -13,7 +13,6 @@ data class Post(
     val date: String,
     val time: String,
     
-    val userImg: String,
     val mediaId: String,
     val mediaImg: String,
     val postType : String,
