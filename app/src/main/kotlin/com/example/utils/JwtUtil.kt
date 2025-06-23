@@ -49,6 +49,7 @@ object JwtUtil {
     }
 
     fun generateRefreshToken(user:Usuario): String {
+        println("Avatar del usuario: ${user.avatar}")
         return Jwts.builder()
             .setSubject(user.email)
             .setIssuedAt(Date())

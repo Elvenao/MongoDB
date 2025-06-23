@@ -9,14 +9,17 @@ import com.example.utils.HashingUtils
 import com.example.utils.CryptoUtils
 import com.example.model.UserNameDto
 import com.example.model.UpdateCategoriesRequest
+import com.example.utils.SaveResources
 
-
+import org.springframework.web.multipart.MultipartFile
+import java.io.File
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.*
 import org.springframework.http.HttpStatus
+import java.net.InetAddress
 
 
 
@@ -24,13 +27,33 @@ import org.springframework.http.HttpStatus
 @RequestMapping("/api")
 class UsersController(
     private val usuarioService: UsuarioService,
-    private val usuarioRepository: UsuarioRepository
+    private val usuarioRepository: UsuarioRepository,
+    private val saveResources: SaveResources,
+    
 ) {
 
     @GetMapping("/users")
     fun listAll(): ResponseEntity<List<Usuario>> {
         val usuarios: List<Usuario> = usuarioService.getAllUsersDecrypted()
         return ResponseEntity.ok(usuarios)
+    }
+
+    @PatchMapping("users/avatar/{id}")
+    fun updateAvatar(
+        @PathVariable id: String,
+        @RequestPart image: MultipartFile
+    ): ResponseEntity<LoginResponse>{
+        val user = usuarioRepository.findById(id).orElse(null)
+        if (user != null) {
+            val ruta = saveResources.guardarImagenEnRutaFisica(image, user.id!!)
+            val rutaCompleta = "/Images/Users/"+ ruta
+            val updated = user.copy(avatar = rutaCompleta)
+            usuarioRepository.save(updated)
+            println("Imagen guardada en: $ruta")
+
+            return ResponseEntity.ok(LoginResponse( true, "Avatar actualizado",))
+        }
+        return ResponseEntity.ok(LoginResponse( false,"Hubo problemas intentelo mas tarde"))
     }
 
     @PatchMapping("users/categories/{id}")
