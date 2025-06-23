@@ -6,10 +6,16 @@ import com.example.repository.PostRepository
 import com.example.repository.UsuarioRepository
 import org.springframework.web.bind.annotation.*
 import org.springframework.http.ResponseEntity
+import com.example.model.Comentario
 
 data class PostWithAvatar(
     val post: Post,
     val userAvatar: String?
+)
+data class NuevoComentarioRequest(
+    val userId: String,
+    val userName: String,
+    val comentario: String
 )
 
 @RestController
@@ -45,5 +51,32 @@ class PostController(
             ResponseEntity.notFound().build()
         }
     }
-}
+    @PostMapping("/{id}/comment")
+    fun agregarComentario(
+        @PathVariable id: String,
+        @RequestBody request: NuevoComentarioRequest
+    ): ResponseEntity<PostWithAvatar?> {
+        val postOpt = postRepository.findById(id)
+        if (postOpt.isPresent) {
+            val post = postOpt.get()
+            val nuevoComentario = Comentario(
+                userId = request.userId,
+                userName = request.userName,
+                comentario = request.comentario,
+                fecha = java.time.LocalDateTime.now().toString()
+            )
+            val comentariosActualizados = post.comments + nuevoComentario
+            val postActualizado = post.copy(comments = comentariosActualizados)
+            postRepository.save(postActualizado)
 
+            val user = usuarioRepository.findById(post.userId).orElse(null)
+            return ResponseEntity.ok(
+                PostWithAvatar(
+                    post = postActualizado,
+                    userAvatar = user?.avatar
+                )
+            )
+        }
+        return ResponseEntity.notFound().build()
+    }
+}

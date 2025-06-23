@@ -2,6 +2,7 @@ package com.example.model
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import com.example.model.Comentario
 
 @Document(collection = "Posts")
 data class Post(
@@ -16,5 +17,5 @@ data class Post(
     val mediaId: String,
     val mediaImg: String,
     val postType : String,
-    var comments: List<Any> 
+    var comments: List<Comentario> 
 )
