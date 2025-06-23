@@ -23,6 +23,13 @@ class PostController(
             "Post creado exitosamente"
         ))
     }
+
+    @GetMapping("/details")
+    fun verPost(@RequestParam id: String): ResponseEntity<Post?> {
+        val post = postRepository.findById(id)
+        return if (post.isPresent) ResponseEntity.ok(post.get())
+            else ResponseEntity.notFound().build()
+    }
 }
 
 
