@@ -14,6 +14,8 @@ data class Usuario(
     var joiningDate: String,
     var password: String,
     var email: String,
-    var avatar: String? = null  
+    var avatar: String? = null,  
+    var following: List<String>? = null,
+    var followers: List<String>? = null
 
 )

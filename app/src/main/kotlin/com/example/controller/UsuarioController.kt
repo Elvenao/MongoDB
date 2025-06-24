@@ -135,6 +135,43 @@ class UsersController(
             ResponseEntity.notFound().build()
         }
     }
+
+
+    @PostMapping("/users/follow/toggle")
+    fun toggleFollow(
+        @RequestParam target: String,   // usuario a seguir/dejar de seguir
+        @RequestParam follower: String  // quien sigue/deja de seguir
+    ): ResponseEntity<Void> {
+        val user = usuarioRepository.findById(target).orElse(null)
+        val followerUser = usuarioRepository.findById(follower).orElse(null)
+
+        if (user == null || followerUser == null) {
+            return ResponseEntity.notFound().build()
+        }
+
+        // Toggle followers en el usuario objetivo
+        val followersSet = (user.followers ?: emptyList()).toMutableSet()
+        if (followersSet.contains(follower)) {
+            followersSet.remove(follower)
+        } else {
+            followersSet.add(follower)
+        }
+        val updatedUser = user.copy(followers = followersSet.toList())
+        usuarioRepository.save(updatedUser)
+
+        // Toggle following en el usuario que sigue
+        val followingSet = (followerUser.following ?: emptyList()).toMutableSet()
+        if (followingSet.contains(target)) {
+            followingSet.remove(target)
+        } else {
+            followingSet.add(target)
+        }
+        val updatedFollower = followerUser.copy(following = followingSet.toList())
+        usuarioRepository.save(updatedFollower)
+
+        return ResponseEntity.ok().build()
+    }
+
 }
 
 
