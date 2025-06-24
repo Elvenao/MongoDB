@@ -2,6 +2,7 @@ package com.example.controller
 
 import com.example.model.Usuario
 import com.example.model.LoginResponse
+import com.example.model.UserIdImg
 import com.example.repository.UsuarioRepository
 import com.example.service.UsuarioService
 import com.example.utils.JwtUtil
@@ -172,6 +173,21 @@ class UsersController(
         return ResponseEntity.ok().build()
     }
 
+    @GetMapping("/users/username/{id}")
+    fun getUserIdImgById(@PathVariable id: String): ResponseEntity<UserIdImg> {
+        val usuario = usuarioRepository.findById(id).orElse(null)
+        return if (usuario != null) {
+            ResponseEntity.ok(
+                UserIdImg(
+                    id = usuario.id ?: "",
+                    username = usuario.userName,
+                    img = usuario.avatar ?: ""
+                )
+            )
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
 }
 
 
