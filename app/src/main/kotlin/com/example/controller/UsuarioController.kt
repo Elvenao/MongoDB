@@ -177,6 +177,7 @@ class UsersController(
     fun getUserIdImgById(@PathVariable id: String): ResponseEntity<UserIdImg> {
         val usuario = usuarioRepository.findById(id).orElse(null)
         return if (usuario != null) {
+            
             ResponseEntity.ok(
                 UserIdImg(
                     id = usuario.id ?: "",

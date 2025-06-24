@@ -16,6 +16,7 @@ data class Usuario(
     var email: String,
     var avatar: String? = null,  
     var following: List<String>? = null,
-    var followers: List<String>? = null
-
+    var followers: List<String>? = null,
+    var like: List<String> = emptyList(),
+    var dislike: List<String> = emptyList()
 )
