@@ -125,6 +125,16 @@ class UsersController(
             refreshToken
         ))
     }
+
+    @GetMapping("/users/{id}")
+    fun getUserProfile(@PathVariable id: String): ResponseEntity<Usuario?> {
+        val usuario = usuarioService.getUserDecrypted(id)
+        return if (usuario != null) {
+            ResponseEntity.ok(usuario)
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
 }
 
 

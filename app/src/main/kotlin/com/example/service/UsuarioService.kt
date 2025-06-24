@@ -22,4 +22,12 @@ class UsuarioService(
             )
         }
     }
+
+    fun getUserDecrypted(id: String): Usuario? {
+        val usuario = usuarioRepository.findById(id).orElse(null)
+        return usuario?.copy(
+            name = CryptoUtils.decryptAES(usuario.name),
+            birthDate = CryptoUtils.decryptAES(usuario.birthDate)
+        )
+    }
 }
