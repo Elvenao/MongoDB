@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.http.ResponseEntity
 import com.example.model.MultimediaIdImg
 
+
+
+
 @RestController
 @RequestMapping("/api/multimedia")
 class MultimediaController(
@@ -21,20 +24,19 @@ class MultimediaController(
         return ResponseEntity.ok(resultados)
     }
 
-
-    @PatchMapping("/idimg/{id}")
-    fun getNameAndImgById(@PathVariable id: String): ResponseEntity<MultimediaIdImg> {
+    
+    @GetMapping("/idimg")
+    fun getNameAndImgById(@RequestParam id: String): ResponseEntity<MultimediaIdImg?> {
         println("ID: "+ id)
         val multimedia = multimediaRepository.findById(id).orElse(null) // ← válido si usas Optional
-        val todas = multimediaRepository.findAll()
-        println("Películas registradas:")
-        todas.forEach { println("ID: '${it.id}', Name: '${it.name}'") }
+        
+        
         return if (multimedia != null) {
             ResponseEntity.ok(
                 MultimediaIdImg(
-                    multimedia.id,
-                    multimedia.name,
-                    multimedia.poster
+                    id = multimedia.id,
+                    name = multimedia.name,
+                    img = multimedia.poster
                 )
             )
         } else {

@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.*
 @Document(collection = "Multimedia")
 data class MultimediaIdImg(
     @Id
-    var id: String,
-    var name: String,
-    var img: String
+    val id: String,
+    val name: String,
+    val img: String
 )
