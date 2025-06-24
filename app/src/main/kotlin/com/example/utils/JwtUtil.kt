@@ -44,6 +44,8 @@ object JwtUtil {
             .claim("genres",user.genres)
             .claim("avatar", user.avatar)
             .claim("ip",ip)
+            .claim("following",user.following)
+            .claim("followers",user.followers)
             .signWith(secretKey)
             .compact()
     }
@@ -63,6 +65,8 @@ object JwtUtil {
             .claim("biography",user.biography)
             .claim("genres",user.genres)
             .claim("avatar", user.avatar)
+            .claim("following",user.following)
+            .claim("followers",user.followers)
             .claim("ip",ip)
             .signWith(secretKey)
             .compact()
