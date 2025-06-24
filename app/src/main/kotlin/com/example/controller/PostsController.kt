@@ -90,4 +90,17 @@ class PostController(
             "Post creado exitosamente"
         ))
     }
+
+    @GetMapping("/users/{idUser}/posts")
+    fun getUserPosts(@PathVariable idUser: String): ResponseEntity<List<PostWithAvatar>> {
+        val posts = postRepository.findAll().filter { it.userId == idUser }
+        val user = usuarioRepository.findById(idUser).orElse(null)
+        val postsWithAvatar = posts.map { post ->
+            PostWithAvatar(
+                post = post,
+                userAvatar = user?.avatar
+            )
+        }
+        return ResponseEntity.ok(postsWithAvatar)
+    }
 }

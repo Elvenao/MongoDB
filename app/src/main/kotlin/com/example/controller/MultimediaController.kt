@@ -45,6 +45,17 @@ class MultimediaController(
         }
     }
     
+    
+
+    @GetMapping("/{id}")
+    fun getMultimediaDetails(@PathVariable id: String): ResponseEntity<List<Multimedia>> {
+        val multimedia = multimediaRepository.findById(id)
+        return if (multimedia.isPresent) {
+            ResponseEntity.ok(listOf(multimedia.get()))
+        } else {
+            ResponseEntity.notFound().build()
+        }
+    }
 }
 
 
