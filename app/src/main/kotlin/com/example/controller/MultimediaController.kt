@@ -17,6 +17,7 @@ class MultimediaController(
     fun buscar(@RequestParam q: String): ResponseEntity<List<Multimedia>> {
         val query = "^${Regex.escape(q)}" // Escapar por seguridad
         val resultados = multimediaRepository.findByNameStartingWith(query)
+        println(resultados)
         return ResponseEntity.ok(resultados)
     }
 

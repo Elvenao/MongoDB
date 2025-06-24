@@ -33,6 +33,14 @@ class UsersController(
     
 ) {
 
+    @GetMapping("/users/buscar")
+    fun buscar(@RequestParam q: String): ResponseEntity<List<Usuario>> {
+        val query = "^${Regex.escape(q)}" // Escapar por seguridad
+        val resultados = usuarioRepository.findByUserNameStartingWith(query)
+        
+        return ResponseEntity.ok(resultados)
+    }
+
     @GetMapping("/users")
     fun listAll(): ResponseEntity<List<Usuario>> {
         val usuarios: List<Usuario> = usuarioService.getAllUsersDecrypted()
