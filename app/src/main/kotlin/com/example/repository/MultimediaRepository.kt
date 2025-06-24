@@ -10,4 +10,6 @@ interface MultimediaRepository : MongoRepository<Multimedia, String>{
 
     @Query("{ 'name': { \$regex: ?0, \$options: 'i' } }")
     fun findByNameStartingWith(texto: String): List<Multimedia>
+ 
+    
 }

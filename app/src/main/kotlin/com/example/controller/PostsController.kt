@@ -28,14 +28,14 @@ class PostController(
 ) {
     @GetMapping
     fun getAll(): List<PostWithAvatar> {
-        val posts = postRepository.findAll()
+        val posts = postRepository.findAll().reversed() // <- invierte la lista
         return posts.map { post ->
             val user = usuarioRepository.findById(post.userId).orElse(null)
             PostWithAvatar(
                 post = post,
                 userAvatar = user?.avatar
             )
-        }
+    }
     }
 
     @GetMapping("/details")

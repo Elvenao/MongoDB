@@ -21,18 +21,24 @@ class MultimediaController(
         return ResponseEntity.ok(resultados)
     }
 
-    @GetMapping("/idimg")
-    fun getNameAndImgById(@RequestParam id: String): ResponseEntity<MultimediaIdImg> {
-        val multimedia = multimediaRepository.findById(id).orElse(null)
+
+    @PatchMapping("/idimg/{id}")
+    fun getNameAndImgById(@PathVariable id: String): ResponseEntity<MultimediaIdImg> {
+        println("ID: "+ id)
+        val multimedia = multimediaRepository.findById(id).orElse(null) // ← válido si usas Optional
+        val todas = multimediaRepository.findAll()
+        println("Películas registradas:")
+        todas.forEach { println("ID: '${it.id}', Name: '${it.name}'") }
         return if (multimedia != null) {
             ResponseEntity.ok(
                 MultimediaIdImg(
-                    id = multimedia.id,
-                    name = multimedia.name,
-                    img = multimedia.poster
+                    multimedia.id,
+                    multimedia.name,
+                    multimedia.poster
                 )
             )
         } else {
+            println("ERRROR")
             ResponseEntity.notFound().build()
         }
     }
