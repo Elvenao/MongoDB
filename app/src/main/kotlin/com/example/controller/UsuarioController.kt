@@ -24,6 +24,7 @@ import java.net.InetAddress
 
 
 
+
 @RestController
 @RequestMapping("/api")
 class UsersController(
@@ -197,6 +198,120 @@ class UsersController(
             ResponseEntity.notFound().build()
         }
     }
+
+    @PatchMapping("/users/email/{id}")
+    fun updateEmail(
+        @PathVariable id: String,
+        @RequestParam email: String
+    ): ResponseEntity<LoginResponse> {
+        val p = email
+        val existing = usuarioRepository.findById(id).orElse(null)
+
+        return if (existing != null) {
+            val updated = existing.copy(email = p)
+            usuarioRepository.save(updated)
+            ResponseEntity.ok(LoginResponse(true, "Email actualizadas"))
+        } else {
+            ResponseEntity.ok(LoginResponse(false, "Email no actualizadas"))
+        }
+        
+    }
+
+    @PatchMapping("/users/password/{id}")
+    fun updatePassword(
+        @PathVariable id: String,
+        @RequestParam password: String
+    ): ResponseEntity<LoginResponse> {
+        val p = HashingUtils.hashingBCrypt(password)
+        val existing = usuarioRepository.findById(id).orElse(null)
+        
+
+        return if (existing != null) {
+            val updated = existing.copy(password = p)
+            usuarioRepository.save(updated)
+            ResponseEntity.ok(LoginResponse(true, "Password actualizadas"))
+        } else {
+            ResponseEntity.ok(LoginResponse(false, "Password no actualizadas"))
+        }
+        
+    }
+    @PatchMapping("/users/username/{id}")
+    fun updateUserName(
+        @PathVariable id: String,
+        @RequestParam userName: String
+    ): ResponseEntity<LoginResponse> {
+        val p = userName
+        val existing = usuarioRepository.findById(id).orElse(null)
+
+        return if (existing != null) {
+            val updated = existing.copy(userName = p)
+            usuarioRepository.save(updated)
+            ResponseEntity.ok(LoginResponse(true, "userName actualizadas"))
+        } else {
+            ResponseEntity.ok(LoginResponse(false, "userName no actualizadas"))
+        }
+        
+    }
+
+   
+
+    @PatchMapping("/users/like/{id}")
+    fun setLike(
+        @PathVariable id: String,
+        @RequestParam mediaId: String
+    ): ResponseEntity<LoginResponse> {
+        val user = usuarioRepository.findById(id).orElse(null)
+
+        return if (user != null) {
+            val likesSet = (user.like ?: emptyList()).toMutableSet()
+
+            val message = if (likesSet.contains(mediaId)) {
+                likesSet.remove(mediaId)
+                "Like eliminado"
+            } else {
+                likesSet.add(mediaId)
+                "Like agregado"
+            }
+
+            val updatedUser = user.copy(like = likesSet.toList())
+            usuarioRepository.save(updatedUser)
+
+            ResponseEntity.ok(LoginResponse(true, message))
+        } else {
+            ResponseEntity.ok(LoginResponse(false, "Usuario no encontrado"))
+        }
+    }
+
+    @PatchMapping("/users/dislike/{id}")
+    fun disLike(
+        @PathVariable id: String,
+        @RequestParam mediaId: String
+    ): ResponseEntity<LoginResponse> {
+        val user = usuarioRepository.findById(id).orElse(null)
+
+        return if (user != null) {
+            val disLikeSet = (user.dislike ?: emptyList()).toMutableSet()
+
+            val message = if (disLikeSet.contains(mediaId)) {
+                disLikeSet.remove(mediaId)
+                "Dislike eliminado"
+            } else {
+                disLikeSet.add(mediaId)
+                "Dislike agregado"
+            }
+
+            val updatedUser = user.copy(dislike = disLikeSet.toList())
+            usuarioRepository.save(updatedUser)
+
+            ResponseEntity.ok(LoginResponse(true, message))
+        } else {
+            ResponseEntity.ok(LoginResponse(false, "Usuario no encontrado"))
+        }
+    }
+
+    
+    
+
 }
 
 

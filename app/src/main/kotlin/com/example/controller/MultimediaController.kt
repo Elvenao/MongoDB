@@ -20,7 +20,7 @@ class MultimediaController(
     fun buscar(@RequestParam q: String): ResponseEntity<List<Multimedia>> {
         val query = "^${Regex.escape(q)}" // Escapar por seguridad
         val resultados = multimediaRepository.findByNameStartingWith(query)
-        println(resultados)
+        
         return ResponseEntity.ok(resultados)
     }
 
@@ -49,7 +49,10 @@ class MultimediaController(
 
     @GetMapping("/{id}")
     fun getMultimediaDetails(@PathVariable id: String): ResponseEntity<List<Multimedia>> {
+        
         val multimedia = multimediaRepository.findById(id)
+        println("IDDD>"+id)
+        println(multimedia)
         return if (multimedia.isPresent) {
             ResponseEntity.ok(listOf(multimedia.get()))
         } else {
