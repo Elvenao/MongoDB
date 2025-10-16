@@ -124,8 +124,9 @@ class UsersController(
         usuario.password = HashingUtils.hashingBCrypt(usuario.password)
         usuario.name = CryptoUtils.encryptAES(usuario.name)
         usuario.birthDate = CryptoUtils.encryptAES(usuario.birthDate)
-        val saverdUser = usuarioRepository.save(usuario)
-        println("Usuario guardado: ${usuario.id} con email: ${usuario.email}")
+        usuarioRepository.save(usuario)
+        println("Usuario guardado: ${usuario.userName} con email: ${usuario.email}")
+        
         val accessToken = JwtUtil.generateAccessToken(usuario)
         val refreshToken = JwtUtil.generateRefreshToken(usuario)
         return ResponseEntity.ok(LoginResponse(
@@ -150,7 +151,7 @@ class UsersController(
     @PostMapping("/users/follow/toggle")
     fun toggleFollow(
         @RequestParam target: String,   // usuario a seguir/dejar de seguir
-        @RequestParam follower: String  // quien sigue/deja de seguir
+        @RequestParam follower: String  // quien sigue / deja de seguir
     ): ResponseEntity<Void> {
         val user = usuarioRepository.findById(target).orElse(null)
         val followerUser = usuarioRepository.findById(follower).orElse(null)
@@ -199,12 +200,85 @@ class UsersController(
         }
     }
 
+    @PatchMapping("/users/like/{id}")
+    fun setLike(
+        @PathVariable id: String, //User ID
+        @RequestParam mediaId: String   //Media ID
+    ): ResponseEntity<LoginResponse> {
+        val user = usuarioRepository.findById(id).orElse(null)
+        println("MediaId : ${mediaId}")
+        if (user != null) {
+            val likeSet = (user.like ?: emptyList()).toMutableSet()
+            val disLikeSet = (user.dislike ?: emptyList()).toMutableSet()
+
+            if(disLikeSet.contains(mediaId)){
+                println("Esta en dislikes!!!")
+                disLikeSet.remove(mediaId)
+                 
+            }
+
+            val message = if (likeSet.contains(mediaId)) {
+                likeSet.remove(mediaId)
+                "Unliked"
+            } else {
+                likeSet.add(mediaId)
+                "Liked"
+            }
+
+            val updatedUser = user.copy(
+                dislike = disLikeSet.toList(),
+                like = likeSet.toList()
+            )
+            usuarioRepository.save(updatedUser)
+
+            return ResponseEntity.ok(LoginResponse(true, message))
+        } else {
+            return ResponseEntity.ok(LoginResponse(false, "Usuario no encontrado"))
+        }
+    }
+
+    @PatchMapping("/users/dislike/{id}")
+    fun disLike(
+        @PathVariable id: String,
+        @RequestParam mediaId: String
+    ): ResponseEntity<LoginResponse> {
+        val user = usuarioRepository.findById(id).orElse(null)
+        println("MediaId : ${mediaId}")
+        if (user != null) {
+            val likeSet = (user.like ?: emptyList()).toMutableSet()
+            val disLikeSet = (user.dislike ?: emptyList()).toMutableSet()
+
+            if(likeSet.contains(mediaId)){
+                println("Esta en likes!!!")
+                likeSet.remove(mediaId)
+                
+            }
+
+            val message = if (disLikeSet.contains(mediaId)) {
+                disLikeSet.remove(mediaId)
+                "Undisliked"
+            } else {
+                disLikeSet.add(mediaId)
+                "Disliked"
+            }
+            
+            val updatedUser = user.copy(
+                dislike = disLikeSet.toList(),
+                like = likeSet.toList()
+            )
+            usuarioRepository.save(updatedUser)
+            return ResponseEntity.ok(LoginResponse(true, message))
+        } else {
+            return ResponseEntity.ok(LoginResponse(false, "Usuario no encontrado"))
+        }
+    }
+/* 
     @PatchMapping("/users/email/{id}")
     fun updateEmail(
         @PathVariable id: String,
-        @RequestParam email: String
+        @RequestParam newEmail: String
     ): ResponseEntity<LoginResponse> {
-        val p = email
+        val p = newEmail
         val existing = usuarioRepository.findById(id).orElse(null)
 
         return if (existing != null) {
@@ -220,9 +294,9 @@ class UsersController(
     @PatchMapping("/users/password/{id}")
     fun updatePassword(
         @PathVariable id: String,
-        @RequestParam password: String
+        @RequestParam newPassword: String
     ): ResponseEntity<LoginResponse> {
-        val p = HashingUtils.hashingBCrypt(password)
+        val p = HashingUtils.hashingBCrypt(newPassword)
         val existing = usuarioRepository.findById(id).orElse(null)
         
 
@@ -235,82 +309,33 @@ class UsersController(
         }
         
     }
-    @PatchMapping("/users/username/{id}")
+    
+    @PatchMapping("/users/updateusername/{id}")
     fun updateUserName(
         @PathVariable id: String,
-        @RequestParam userName: String
+        @RequestParam newUserName: String
     ): ResponseEntity<LoginResponse> {
-        val p = userName
+        val p = newUserName
         val existing = usuarioRepository.findById(id).orElse(null)
 
-        return if (existing != null) {
+        if (existing != null) {
+            println("Encontrado")
             val updated = existing.copy(userName = p)
             usuarioRepository.save(updated)
-            ResponseEntity.ok(LoginResponse(true, "userName actualizadas"))
+            return ResponseEntity.ok(LoginResponse(true, "userName actualizadas"))
         } else {
-            ResponseEntity.ok(LoginResponse(false, "userName no actualizadas"))
+            println("NO ENCONTRADO")
+            return ResponseEntity.ok(LoginResponse(false, "userName no actualizadas"))
         }
         
     }
 
    
 
-    @PatchMapping("/users/like/{id}")
-    fun setLike(
-        @PathVariable id: String,
-        @RequestParam mediaId: String
-    ): ResponseEntity<LoginResponse> {
-        val user = usuarioRepository.findById(id).orElse(null)
-
-        return if (user != null) {
-            val likesSet = (user.like ?: emptyList()).toMutableSet()
-
-            val message = if (likesSet.contains(mediaId)) {
-                likesSet.remove(mediaId)
-                "Like eliminado"
-            } else {
-                likesSet.add(mediaId)
-                "Like agregado"
-            }
-
-            val updatedUser = user.copy(like = likesSet.toList())
-            usuarioRepository.save(updatedUser)
-
-            ResponseEntity.ok(LoginResponse(true, message))
-        } else {
-            ResponseEntity.ok(LoginResponse(false, "Usuario no encontrado"))
-        }
-    }
-
-    @PatchMapping("/users/dislike/{id}")
-    fun disLike(
-        @PathVariable id: String,
-        @RequestParam mediaId: String
-    ): ResponseEntity<LoginResponse> {
-        val user = usuarioRepository.findById(id).orElse(null)
-
-        return if (user != null) {
-            val disLikeSet = (user.dislike ?: emptyList()).toMutableSet()
-
-            val message = if (disLikeSet.contains(mediaId)) {
-                disLikeSet.remove(mediaId)
-                "Dislike eliminado"
-            } else {
-                disLikeSet.add(mediaId)
-                "Dislike agregado"
-            }
-
-            val updatedUser = user.copy(dislike = disLikeSet.toList())
-            usuarioRepository.save(updatedUser)
-
-            ResponseEntity.ok(LoginResponse(true, message))
-        } else {
-            ResponseEntity.ok(LoginResponse(false, "Usuario no encontrado"))
-        }
-    }
+    
 
     
-    
+*/    
 
 }
 
