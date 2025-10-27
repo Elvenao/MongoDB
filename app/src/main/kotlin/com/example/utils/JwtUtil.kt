@@ -9,11 +9,12 @@ import com.example.model.UserLoginDto
 import java.util.*
 import com.example.model.Usuario
 import java.net.InetAddress
+import com.example.locals.Local
 
 
 object JwtUtil {
     
-    private val ip = InetAddress.getLocalHost().hostAddress
+    private val ip = Local.getURL()
     
 
     private val secretKey = Keys.hmacShaKeyFor("8da949392%1!5423_381j39ja2$6asdfas12".toByteArray())

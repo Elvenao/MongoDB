@@ -13,7 +13,7 @@ import java.net.InetAddress
 
 object JwtUtil {
     
-    private val ip = InetAddress.getLocalHost().hostAddress
+    private val ip = "https://bf746da6e87b.ngrok-free.app"
     
 
     private val secretKey = Keys.hmacShaKeyFor("8da949392%1!5423_381j39ja2$6asdfas12".toByteArray())

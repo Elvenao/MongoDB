@@ -7,6 +7,7 @@ import com.example.repository.UsuarioRepository
 import org.springframework.web.bind.annotation.*
 import org.springframework.http.ResponseEntity
 import com.example.model.Comentario
+import com.example.model.LikeInformation
 
 
 
@@ -20,6 +21,12 @@ data class NuevoComentarioRequest(
     val comentario: String
 )
 
+data class LikeInformationUptaded(
+    val message: String,
+    val likes: Long,
+    val likesList: List<LikeInformation>
+)
+
 @RestController
 @RequestMapping("/api/posts")
 class PostController(
@@ -28,14 +35,14 @@ class PostController(
 ) {
     @GetMapping
     fun getAll(): List<PostWithAvatar> {
-        val posts = postRepository.findAll().reversed() // <- invierte la lista
-        return posts.map { post ->
-            val user = usuarioRepository.findById(post.userId).orElse(null)
-            PostWithAvatar(
-                post = post,
-                userAvatar = user?.avatar
-            )
-    }
+    val posts = postRepository.findAll().reversed()
+    return posts.map { post ->
+        val user = post.userId?.let { usuarioRepository.findById(it).orElse(null) }
+        PostWithAvatar(
+            post = post,
+            userAvatar = user?.avatar
+        )
+        }
     }
 
     @GetMapping("/details")
@@ -83,12 +90,41 @@ class PostController(
     }
     @PostMapping("/create")
     fun crear(@RequestBody post: Post): ResponseEntity<Any> {
-        println("HOLA")
+        
         postRepository.save(post)
+        println("Post Created")
         return ResponseEntity.ok(PostResponse(
             true,
             "Post creado exitosamente"
         ))
+    }
+    
+    @PostMapping("/like/{id}")
+    fun likePost(@PathVariable id: String, @RequestBody likesInformation: LikeInformation): ResponseEntity<Any> {
+        val post = postRepository.findById(id).orElse(null) 
+            ?: return ResponseEntity.status(404).body("Post no encontrado")
+        
+        val likeSet = (post.likesInformation ?: emptyList()).toMutableSet()
+        val existingLike = likeSet.find { it.userId == likesInformation.userId }
+        var message: String
+        if(existingLike != null){
+            likeSet.remove(existingLike)
+            post.likes = post.likes - 1
+            message = "Disliked"
+        }else{
+            likeSet.add(likesInformation)
+            post.likes = post.likes + 1
+            message = "Liked"
+        }
+        post.likesInformation = likeSet.toList()
+        postRepository.save(post)
+
+        
+        return ResponseEntity.ok(
+            LikeInformationUptaded(
+                message, post.likes, post.likesInformation
+            )
+        )
     }
 
     @GetMapping("/users/{idUser}/posts")
